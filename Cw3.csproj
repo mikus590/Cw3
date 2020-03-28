@@ -5,6 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\Nowy folder\**" />
+    <Content Remove="Controllers\Nowy folder\**" />
+    <EmbeddedResource Remove="Controllers\Nowy folder\**" />
+    <None Remove="Controllers\Nowy folder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Controllers\ValuesController.cs" />
   </ItemGroup>
 
