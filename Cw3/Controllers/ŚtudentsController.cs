@@ -52,10 +52,11 @@ namespace Cw3.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateStudent(Student student)
+        public IActionResult CreateStudent([FromBody]Student student)
         {
             student.IndexNumber = $"s{new Random().Next(1, 20000)}";
-            return Ok(student);
+            //...
+            return Ok(student); //JSON
         }
     }
 }
