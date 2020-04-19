@@ -22,7 +22,7 @@ namespace Cw3.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetStudents()
+        public IActionResult GetStudents(String IndexNumber)
         {
             var list = new List<Student>();
             using (SqlConnection con = new SqlConnection(ConString))
@@ -39,7 +39,7 @@ namespace Cw3.Controllers
                 result += "  ss.Name ";
                 result += "from dbo.Student s with(nolock)";
                 result += "  inner join dbo.Enrollment e with(nolock) on e.IdEnrollment = s.IdEnrollment";
-                result += "  inner join dbo.Studies ss with(nolock) on ss.IdStudy = e.IdStudy";
+                result += "  inner join dbo.Studies ss with(nolock) on ss.IdStudy = e.IdStudy ";
                 com.CommandText = result;
                 
 
@@ -61,22 +61,66 @@ namespace Cw3.Controllers
             return Ok(list);
         }
 
+        [HttpGet("{IndexNumber}")]
+        public IActionResult GetStudent(String IndexNumber)
+        {
+            var list = new List<Student>();
+            using (SqlConnection con = new SqlConnection(ConString))
+            using (SqlCommand com = new SqlCommand())
+            {
+                com.Connection = con;
+                String result = "";
+                result = "select";
+                result += "  s.FirstName,";
+                result += "  s.IndexNumber,";
+                result += "  s.LastName,";
+                result += "  s.BirthDate,";
+                result += "  e.Semester, ";
+                result += "  ss.Name ";
+                result += "from dbo.Student s with(nolock)";
+                result += "  inner join dbo.Enrollment e with(nolock) on e.IdEnrollment = s.IdEnrollment";
+                result += "  inner join dbo.Studies ss with(nolock) on ss.IdStudy = e.IdStudy ";
+                result += "where s.IndexNumber = @IndexNumber";
+                com.CommandText = result;
+                com.Parameters.AddWithValue("IndexNumber", IndexNumber);
+
+
+                con.Open();
+                var dr = com.ExecuteReader();
+                if(dr.Read())
+                {
+                    var st = new Student();
+                    st.IndexNumber = dr["IndexNumber"].ToString();
+                    st.FirstName = dr["FirstName"].ToString();
+                    st.LastName = dr["LastName"].ToString();
+                    st.BirthDate = Convert.ToDateTime((dr["BirthDate"])); ;
+                    st.Semester = Convert.ToInt16(dr["Semester"]);
+                    st.Name = dr["Name"].ToString();
+                    return Ok(st);
+                }
+            }
+            return NotFound();
+        }
+
+
         
 
-        [HttpGet("{id}")]
-        public IActionResult GetStudent(int id)
-        {
-            if (id == 1)
-            {
-                return Ok("Kowalski");
-            }
-            else if (id == 2)
-            {
-                return Ok("Malewski");
-            }
+        
 
-            return NotFound("Nie znaleziono studenta");
-        }
+        //[HttpGet("{id}")]
+        //public IActionResult GetStudent(int id)
+        //{
+        //    if (id == 1)
+        //    {
+        //        return Ok("Kowalski");
+        //    }
+        //    else if (id == 2)
+        //    {
+        //        return Ok("Malewski");
+        //    }
+
+        //    return NotFound("Nie znaleziono studenta");
+        //}
 
         [HttpPut("{id}")]
         public IActionResult PutStudent(int id)
