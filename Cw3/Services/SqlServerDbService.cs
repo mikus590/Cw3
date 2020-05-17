@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Cw3.DTOs;
 using Cw3.DTOs.Requests;
 using Cw3.DTOs.Responses;
+using Cw3.Models;
 
 namespace Cw3.Services
 {
@@ -163,10 +164,10 @@ namespace Cw3.Services
                     {
                         dr.Close();
                         tran.Rollback();
-                        return StatusCode(404, "Brak powiązania w tabeli Enrollment");
+                        return null;
                     }
                     dr.Close();
-                    com.CommandText = "exec promoteStudents @Studies, @semester;";
+                    com.CommandText = "exec promoteStudents @Studies, @Semester;";
                     dr = com.ExecuteReader();
                     dr.Read();
                     var response = new EnrollStudentResponse()
@@ -188,10 +189,6 @@ namespace Cw3.Services
             }
         }
 
-        private EnrollStudentResponse StatusCode(int v1, string v2)
-        {
-            throw new NotImplementedException(v1 + " " + v2);
-        }
 
         private EnrollStudentResult BadRequest(SqlException exc)
         {
@@ -200,6 +197,36 @@ namespace Cw3.Services
         private EnrollStudentResponse Bad(SqlException exc)
         {
             throw new NotImplementedException("Connection error");
+        }
+
+        public IEnumerable<Student> GetStudents()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Student GetStudent(string index)
+        {
+            using (SqlConnection con = new SqlConnection(ConString))
+            using (SqlCommand com = new SqlCommand()) {
+                com.Connection = con;
+                con.Open();
+
+                com.CommandText = "select 1 from dbo.Student s where s.indexNumber = @indexNumber";
+                com.Parameters.AddWithValue("indexNumber", index);
+
+                var dr = com.ExecuteReader();
+                if (!dr.Read())
+                {
+                    dr.Close();
+                    return null;
+                }
+                dr.Close();
+
+                return new Student {
+                    IndexNumber = index
+                };
+
+            }
         }
     }
     

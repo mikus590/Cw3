@@ -43,7 +43,8 @@ namespace Cw3.Controllers
                 case ResultCodes.studentIstnieje:
                     return BadRequest("Podany student już istnieje");
             }
-            return Created("", response.Response);
+
+            return StatusCode(201, response);
 
         }
 
@@ -53,8 +54,11 @@ namespace Cw3.Controllers
 
             var response = _service.PromoteStudents(request);
 
-            return Created("", response);
+            if (response == null) {
+                return NotFound("W tabeli Enrollment nie istnieje wpis o podanej wartości Studies i Semester");
+            }
 
+            return StatusCode(201, response);
 
         }
     }
